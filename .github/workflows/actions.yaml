@@ -25,14 +25,14 @@ jobs:
         id: check
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
-          git diff --name-only origin/main package-lock.json package.json
-          echo "::set-output name=changed::$(git diff --name-only origin/main package-lock.json package.json)"
+          changed_file=$(git diff --name-only origin/main package-lock.json package.json)
+          echo "::set-output name=changed::${changed_file}"
 
-      - name: Install dependencies
-        if: steps.check.outputs.changed == 'package-lock.json'
-        run: echo "package-lock.json has changed"
-
-      - name: Install dependencies
-        if: steps.check.outputs.changed == 'package.json'
-        run: echo "package.json has changed"
-
+      - name: Echo Changes
+        run: |
+          if [[ ${{ steps.check.outputs.changed }} == *"package-lock.json"* ]]; then
+            echo "package-lock.json has changed"
+          fi
+          if [[ ${{ steps.check.outputs.changed }} == *"package.json"* ]]; then
+            echo "package.json has changed"
+          fi
