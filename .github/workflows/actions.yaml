@@ -29,10 +29,9 @@ jobs:
           echo "::set-output name=changed::${changed_file}"
 
       - name: Echo Changes
-        run: |
-          if [[ ${{ steps.check.outputs.changed }} == *"package-lock.json"* ]]; then
-            echo "package-lock.json has changed"
-          fi
-          if [[ ${{ steps.check.outputs.changed }} == *"package.json"* ]]; then
-            echo "package.json has changed"
-          fi
+        if: steps.check.outputs.changed == 'package-lock.json'
+        run: echo "package-lock.json changed"
+        
+      - name: Echo Changes
+        if: steps.check.outputs.changed == 'package.json'
+        run: echo "package.json changed"
