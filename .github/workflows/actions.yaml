@@ -3,7 +3,7 @@ name: Build & Deploy
 on:
   push:
     branches:
-      - staging
+      - main
 
 jobs:
   deploy:
@@ -29,4 +29,3 @@ jobs:
         if: steps.check_changes.outputs.changes
         run: echo "Installing dependencies"
 
-        
