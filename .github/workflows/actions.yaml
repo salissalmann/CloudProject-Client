@@ -1,0 +1,33 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      CI: false
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check for changes in package files
+        id: check_changes
+        run: echo "::set-output name=changes::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'package-lock.json\|package.json' || true)"
+
+      - name: Install dependencies if changes
+        if: steps.check_changes.outputs.changes
+        run: echo "Installing dependencies" && npm ci"
+
+      - name: Build file
+        run: npm run build
