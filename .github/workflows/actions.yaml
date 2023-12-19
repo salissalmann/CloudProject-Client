@@ -21,11 +21,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check for changes in package files
-        id: check_changes
-        run: echo "::set-output name=changes::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'package-lock.json\|package.json' || true)"
+      - name: Check for changes in package-lock.json and package.json
+        id: check
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/main:refs/remotes/origin/main
+          git diff --name-only origin/main package-lock.json package.json
+          echo "::set-output name=changed::$(git diff --name-only origin/main package-lock.json package.json)"
 
-      - name: Install dependencies if changes
-        if: steps.check_changes.outputs.changes
-        run: echo "Installing dependencies"
+      - name: Install dependencies
+        if: steps.check.outputs.changed == 'package-lock.json'
+        run: echo "package-lock.json has changed"
+
+      - name: Install dependencies
+        if: steps.check.outputs.changed == 'package.json'
+        run: echo "package.json has changed"
 
