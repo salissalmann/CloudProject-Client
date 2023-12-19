@@ -3,7 +3,7 @@ name: Build & Deploy
 on:
   push:
     branches:
-      - main
+      - staging
 
 jobs:
   deploy:
@@ -23,13 +23,8 @@ jobs:
 
       - name: Check for changes in package files
         id: check_changes
-        run: echo "::set-output name=changes::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep 'package-lock.json\|package.json' || true)"
+        run: echo "::set-output name=changes::$(git diff --name-only <commit_hash_before> <commit_hash_after> | grep 'package-lock.json\|package.json' || true)"
 
       - name: Install dependencies if changes
         if: steps.check_changes.outputs.changes
-        run: echo "Installing dependencies" && npm ci"
-
-      - name: Install dependencies if changes
-        if: !steps.check_changes.outputs.changes
-        run: echo "No changes in package files"
-            
+        run: echo "Installing dependencies"
